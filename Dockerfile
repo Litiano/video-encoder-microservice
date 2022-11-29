@@ -30,6 +30,8 @@ RUN apk add --update --upgrade curl python unzip bash gcc g++ scons && \
 
 WORKDIR /go/src
 
+RUN mkdir -p /.cache/go-build
+RUN chmod -R 777 /.cache
 USER 1000
 
 #vamos mudar para o endpoint correto. Usando top apenas para segurar o processo rodando
