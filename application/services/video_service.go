@@ -59,17 +59,16 @@ func (videoService *VideoService) Download(bucketName string) error {
 }
 
 func (videoService *VideoService) Fragment() error {
-	err := os.Mkdir(os.Getenv("localStoragePath")+"/"+videoService.Video.ID, os.ModePerm)
+	baseDir := os.Getenv("localStoragePath") + "/"
+	err := os.Mkdir(baseDir+videoService.Video.ID, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	baseDir := os.Getenv("localStoragePathDocker") + "/" // @todo only docker
 	source := baseDir + videoService.Video.ID + ".mp4"
 	target := baseDir + videoService.Video.ID + ".frag"
 
-	//cmd := exec.Command("mp4fragment", source, target) // @todo only docker
-	log.Printf("docker-compose exec -T app mp4fragment %v %v", source, target)                // @todo only docker
+	//cmd := exec.Command("mp4fragment", source, target)
 	cmd := exec.Command("docker-compose", "exec", "-T", "app", "mp4fragment", source, target) // @todo only docker
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -86,15 +85,15 @@ func (videoService *VideoService) Encode() error {
 	cmdArgs = append(
 		cmdArgs,
 		"exec", "-T", "app", "mp4dash", // @todo only docker
-		os.Getenv("localStoragePathDocker")+"/"+videoService.Video.ID+".frag", // @todo only docker
+		os.Getenv("localStoragePath")+"/"+videoService.Video.ID+".frag",
 		"--use-segment-timeline",
 		"-o",
-		os.Getenv("localStoragePathDocker")+"/"+videoService.Video.ID, // @todo only docker
+		os.Getenv("localStoragePath")+"/"+videoService.Video.ID,
 		"-f",
 		"--exec-dir",
 		"/opt/bento4/bin/",
 	)
-	//cmd := exec.Command("mp4dash", cmdArgs...) // @todo only docker
+	//cmd := exec.Command("mp4dash", cmdArgs...)
 	cmd := exec.Command("docker-compose", cmdArgs...) // @todo only docker
 	output, err := cmd.CombinedOutput()
 	if err != nil {
