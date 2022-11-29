@@ -36,11 +36,9 @@ func (videoUpload *VideoUpload) UploadObject(objectPath string, client *storage.
 	// googleapi: Error 400: Cannot insert legacy ACL for an object when uniform bucket-level access is enabled. Read more at https://cloud.google.com/storage/docs/uniform-bucket-level-access, invalid
 	//wc.ACL = []storage.ACLRule{{Entity: storage.AllUsers, Role: storage.RoleReader}} // error
 
-	log.Println("init copy file " + objectPath)
 	if _, err := io.Copy(wc, file); err != nil {
 		return err
 	}
-	log.Println("end copy file " + objectPath)
 
 	if err := wc.Close(); err != nil {
 		return err
@@ -103,9 +101,16 @@ func (videoUpload *VideoUpload) ProcessUpload(concurrency int, doneUpload chan s
 		close(in)
 	}()
 
+	countDoneWorker := 0
 	for r := range returnChannel {
+		countDoneWorker++
 		if r != "" {
 			doneUpload <- r
+			break
+		}
+
+		if countDoneWorker == len(videoUpload.Paths) {
+			doneUpload <- "upload completed"
 			break
 		}
 	}
@@ -123,6 +128,4 @@ func (videoUpload *VideoUpload) uploadWorker(in chan int, returnChannel chan str
 		}
 		returnChannel <- ""
 	}
-
-	returnChannel <- "upload completed"
 }
