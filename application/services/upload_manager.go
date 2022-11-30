@@ -23,7 +23,6 @@ func NewVideoUpload() *VideoUpload {
 }
 
 func (videoUpload *VideoUpload) UploadObject(objectPath string, client *storage.Client, ctx context.Context) error {
-	log.Println("uploading file " + objectPath)
 	path := strings.Split(objectPath, os.Getenv("localStoragePath")+"/")
 
 	file, err := os.Open(objectPath)
@@ -44,7 +43,6 @@ func (videoUpload *VideoUpload) UploadObject(objectPath string, client *storage.
 		return err
 	}
 
-	log.Println("uploaded file " + objectPath)
 	return nil
 }
 

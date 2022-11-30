@@ -83,7 +83,7 @@ func (jobService *JobService) failJob(jobError error) error {
 		return err
 	}
 
-	return nil
+	return jobError
 }
 
 func (jobService *JobService) performUpload() error {

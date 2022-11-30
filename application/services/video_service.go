@@ -127,6 +127,15 @@ func (videoService *VideoService) Finish() error {
 	return nil
 }
 
+func (videoService *VideoService) InsertVideo() error {
+	_, err := videoService.VideoRepository.Insert(videoService.Video)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func printOutput(output []byte) {
 	if len(output) > 0 {
 		log.Printf("==========> Ouput: %s\n", string(output))
